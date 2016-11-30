@@ -1,6 +1,7 @@
 ; sapid lisp
 ; Printing
-; gilles.arcas@gmail.com, http://code.google.com/p/sapid-lisp/
+; gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
+; MIT license
 
 ; This file redefines the builtin functions print, print and terpri to:
 ; - admit several arguments,

@@ -1,6 +1,7 @@
 # sapid lisp
 # python implementation
-# gilles.arcas@gmail.com, sites.google.com/site/sapidlisp
+# gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
+# MIT license
 
 import sys, os, time
 
