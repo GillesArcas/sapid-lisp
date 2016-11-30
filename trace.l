@@ -1,7 +1,7 @@
 ; sapid lisp
 ; Tracing
 ; gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
-; MIT license
+; MIT license 
 
 ; Interface
 
