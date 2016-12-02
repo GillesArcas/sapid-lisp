@@ -1,6 +1,7 @@
 ; sapid lisp
 ; Testing
-; gilles.arcas@gmail.com, sites.google.com/site/sapidlisp
+; gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
+; MIT license
 
 ; This module tests various aspects of sapid working: recursion optimization,
 ; exceptions and part of the API.

@@ -1,6 +1,7 @@
 ; sapid lisp
 ; Testing
-; gilles.arcas@gmail.com, sites.google.com/site/sapidlisp
+; gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
+; MIT license
 
 ; This module enables to define tests and test suites.
 
