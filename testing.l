@@ -50,13 +50,13 @@
         (print "Timing : " (- (time) t0)) ) )
 
 (de test (test-suite)
-    (makunbound 'check-stack)    
+    (makunbound 'check-stack)
     ; process null test to get stack high with the correct value (same number of instructions as actual test)
     (let ((t0 (time)))
         (if (apply 'and (mapcar (lambda (x) (apply 'check (assq x *testing*))) '(null-test)))
-            () 
+            ()
             () )
-        () ) 
+        () )
     ; process test suite
     (let ((t0 (time)))
         (if (apply 'and (mapcar (lambda (x) (apply 'check (assq x *testing*))) test-suite))
@@ -65,7 +65,7 @@
         (print "Timing : " (- (time) t0)) )
     t )
 
-(dm check (testname expr res lvar) 
+(dm check (testname expr res lvar)
     (let ((lval (mapcar (lambda (x) (random 10000)) lvar))(t0 (time)))
         `(let ,(mapcar (lambda (x y) (list x y)) lvar lval)
             (prin "Testing " ' ,testname ": " ',expr " : ")
@@ -74,7 +74,7 @@
                 (print "Failure")
                 () ) ) ) )
 
-(dm check-null-test (testname expr res lvar) 
+(dm check-null-test (testname expr res lvar)
     `(let ()
         (if (test-result ()()()()) () ()) ) )
 
@@ -110,7 +110,7 @@
 ; null test
 
 (deftest null-test () () ())
-             
+
 ; benchmarking
 
 (de bench (suite n)
