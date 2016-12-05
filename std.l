@@ -993,7 +993,7 @@
     (reduce-macro '* 'subr.* 1 l) )
     
 (describe / (x y)
-    "Divides x by y." )
+    "Divides x by y (integer division)." )
 
 (describe % (x y)
     "Returns the remainder of x divided by y." )
