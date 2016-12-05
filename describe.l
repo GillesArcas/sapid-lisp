@@ -36,14 +36,14 @@
         (mapc (lambda (x) (print "    " x)) (getprop sym 'describe-text)) )
     (cons 'quote (cons sym ()))
 )
-    
+
 (de describe-store (sym largs text)
     ; used during startup, uses only builtin functions
     (plist sym (cons 'describe-largs (cons largs (plist sym))))
     (plist sym (cons 'describe-text  (cons text  (plist sym)))) 
     (cons 'quote (cons sym ())) )
 
-(de typefn (x) (car (fvalue x)))    
+(de typefn (x) (car (fvalue x)))
 (if (eq (typefn 'de ) 'fsubr) (synonym 'subr.de  'de))
 (if (eq (typefn 'dm ) 'fsubr) (synonym 'subr.dm  'dm))
 (if (eq (typefn 'dmd) 'fsubr) (synonym 'subr.dmd 'dmd))
