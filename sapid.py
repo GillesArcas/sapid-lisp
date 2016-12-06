@@ -3,11 +3,32 @@
 # gilles.arcas@gmail.com, https://github.com/GillesArcas/sapid-lisp
 # MIT license
 
-import sys, os, time
+from __future__ import print_function
+
+import sys
+import os
+import time
 
 # Configuration
 
 TailRecursionOptimization = 'MutualRecursion' # None | 'TailRecursion' | 'MutualRecursion'
+
+# 2/3 compatibility
+
+if sys.version_info < (3,):
+    integer_types = (int, long,)
+else:
+    integer_types = (int,)
+
+if sys.version_info < (3,):
+    func_name_attribute = 'func_name'
+else:
+    func_name_attribute = '__name__'
+
+if sys.version_info < (3,):
+    input_func = raw_input
+else:
+    input_func = input
 
 # Items
 
@@ -125,7 +146,7 @@ def symbolp(x):
     return isinstance(x, symbol)
 
 def numberp(x):
-    return isinstance(x, (int, long))
+    return isinstance(x, integer_types)
 
 def stringp(x):
     return isinstance(x, str)
@@ -186,6 +207,7 @@ def evalform(form, func, larg):
 # Function evaluation
 
 def evalfn(form, func, ftype, fval, larg):
+
     if hasattr(ftype, 'evalfunc'):
         return ftype.evalfunc(func, fval, larg, form)
     else:
@@ -576,11 +598,11 @@ class TInputStreamKeyboard(TInputStream):
 
     def readline(self):
         sys.stdout.write(Prompt)
-        self.inputbuffer = raw_input()
+        self.inputbuffer = input_func()
         TInputStream.readline(self)
 
 class TInputStreamFile(TInputStream):
-    def __init__(self, x):  
+    def __init__(self, x):
         try:
             self.inputfile = open(findfile(x))
         except:
@@ -592,8 +614,11 @@ class TInputStreamFile(TInputStream):
 
     def readline(self):
         try:
-            self.inputbuffer = self.inputfile.next()
-            TInputStream.readline(self)
+            self.inputbuffer = self.inputfile.readline()
+            if self.inputbuffer == '':
+                raise StopIteration
+            else:
+                TInputStream.readline(self)
         except StopIteration:
             if self.readinglist:
                 readerror(1)
@@ -601,7 +626,7 @@ class TInputStreamFile(TInputStream):
                 iexit(Eof, Nil)
         except Exception as e:
             error(IoError, 'read', e.args[0])
-            
+
 def findfile(filename):
     if os.path.exists(filename):
         return filename
@@ -701,7 +726,7 @@ def is_handle_valid(handle, mode):
     return (0 <= handle < len(Streams) and
            Streams[handle] != None and
            Streams[handle].mode == mode)
-           
+
 def subr_prompt(arg):                 # Subr01
     global Prompt
     if arg != None:
@@ -1040,8 +1065,8 @@ def getfvalue(sym):
         return Nil
     elif sym.ftype in [Lambda, Macro, DMacro]:
         return cons(sym.ftype, sym.fval)
-    elif hasattr(sym.fval, 'func_name'):
-        return cons(sym.ftype, sym.fval.func_name)
+    elif hasattr(sym.fval, func_name_attribute):
+        return cons(sym.ftype, getattr(sym.fval, func_name_attribute))
     else:
         error(ArgError, 'valfn', sym)
 
@@ -1164,7 +1189,7 @@ def subr_mul(x, y):                   # Subr2
 def subr_div(x, y):                   # Subr2
     assert_numberp(x, '/')
     assert_numberp(y, '/')
-    return x / y
+    return x // y
 
 def subr_mod(x, y):                   # Subr2
     assert_numberp(x, '%')
@@ -1230,7 +1255,7 @@ def subr_number(x):                   # Subr1
 
 def subr_toplevel():                  # Subr0
     x = eval(readitem())
-    print '= ',
+    print('= ', end=' ')
     printitem(x)
     return x
 
@@ -1241,7 +1266,7 @@ def subr_time():                      # Subr0
     return int(time.time())
 
 def subr_cls():                       # Subr0
-    print os.system('cls'), chr(13), ' ', chr(13),
+    print(os.system('cls'), chr(13), ' ', chr(13), end=' ')
     return T
 
 def format_stackrec(stackrec):
@@ -1348,8 +1373,8 @@ def InitSubrs():
     intern('end'     , Subr0 , subr_end)
     intern('cls'     , Subr0 , subr_cls)
     intern('stack'   , Subr0 , subr_stack)
-    
-# Assertions    
+
+# Assertions
 
 def assert_condition(condition, error_symbol, func, arg):
     if not condition:
@@ -1388,18 +1413,18 @@ def assert_charp(arg, func):
 # Error handling
 
 def printerror(error_symbol, func, arg):
-    print '\n** ',
+    print('\n** ', end=' ')
     prin(error_symbol if unboundp(error_symbol) else error_symbol.cval)
-    print(' : '),
+    print(' : ', end=' ')
     prin(func)
-    print(' : '),
+    print(' : ', end=' ')
     prin(arg)
-    print '\n'
+    print('\n')
 
 def error(error_symbol, func, arg):
     # enable to redefine error function in lisp
     applyform(intern('error'), lisplist([error_symbol, func, arg]))
-        
+
 def subr_error(larg):                 # NSubr
     assert_condition(len(larg) == 3, ArgNumberError, 'error', len(larg))
     error_symbol, func, arg = larg
@@ -1407,7 +1432,7 @@ def subr_error(larg):                 # NSubr
     # the result is the name of the error.
     # body of exit form being evaluated, constructs ('error_symbol)
     iexit(TopError, cons(cons(intern('quote'), cons(error_symbol, Nil)), Nil))
-    
+
 # Main loop
 
 def mainloop():
@@ -1419,11 +1444,11 @@ def mainloop():
         except EvalException as e:
             printerror(UndefTagError, 'eval', e.tag)
         except (RuntimeError, ZeroDivisionError) as e:
-            print '\n** Runtime error: %s\n' % e.args
+            print('\n** Runtime error: %s\n' % e.args)
         except KeyboardInterrupt:
-            print '\n** Interrupt by user.\n'
+            print('\n** Interrupt by user.\n')
         except:
-            print '\n** Host error.\n'
+            print('\n** Host error.\n')
             raise
 
 def calltoplevel():
@@ -1444,6 +1469,6 @@ def init():
 def loadini():
     load('sapid.ini')
 
-init()    
+init()
 if __name__ == '__main__':
     mainloop()
